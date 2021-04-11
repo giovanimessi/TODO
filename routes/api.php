@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ApiController; 
+use App\Http\Controllers\AuthController;
 
 
 
@@ -16,7 +17,14 @@ Route::get("/ping",function(){
     ];
 
 });
+Route::get('/unauthenticated',function(){
+    return ['error' => 'Usuario nao logado'];
+})->name('login');
 
+
+Route::post('/users',[AuthController::class, 'criar']);
+Route::post('/auth/login',[AuthController::class, 'login']);
+Route::middleware('auth:sanctum')->get('/auth/logout',[AuthController::class, 'logout']);
 
 //Crud de lista
 
@@ -33,8 +41,9 @@ Route::get("/ping",function(){
 //DELETE ->atualizar uma tarefa no sistema [TODOS/2]
 
 
-Route::post('/todo',[ApiController::class, 'creaLista']);//crear
-Route::get('/todo',[ApiController::class, 'lerTodos']); //exibir
+
+Route::middleware('auth:sanctum')->post('/todo',[ApiController::class, 'creaLista']);//crear
+Route::get('/todos',[ApiController::class, 'lerTodos']); //exibir
 Route::get('/todo/{id}',[ApiController::class, 'exbirTodos']); //ler um so
 Route::put('/todo/{id}',[ApiController::class, 'updateLista']); //atualizar
 Route::delete('/todo/{id}',[ApiController::class, 'deleteLista']); //deltar
